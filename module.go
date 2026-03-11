@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/ovya/ogl/core"
+	"github.com/ovya/ogl/oglcore"
 	"github.com/rotisserie/eris"
 )
 
@@ -17,8 +17,8 @@ type Module struct {
 	logger     *slog.Logger
 }
 
-// Ensure Module implements core.Module
-var _ core.Module = (*Module)(nil)
+// Ensure Module implements oglcore.Module
+var _ oglcore.Module = (*Module)(nil)
 
 func (m *Module) RegisterRoutes(_ *http.ServeMux) {}
 
