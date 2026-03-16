@@ -8,30 +8,34 @@ import (
 	"net/http"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/ovya/ogl/oglcore"
+	oglcore "github.com/ovya/ogl/platform/core"
 	"github.com/rotisserie/eris"
 )
 
-type Module struct {
+type App struct {
 	subscriber message.Subscriber
 	logger     *slog.Logger
 }
 
 // Ensure Module implements oglcore.Module
-var _ oglcore.Module = (*Module)(nil)
+var _ oglcore.Module = (*App)(nil)
 
-func (m *Module) RegisterRoutes(_ *http.ServeMux) {}
+func (m *App) RegisterRoutes(_ *http.ServeMux) {}
 
-func Build(subscriber message.Subscriber, logger *slog.Logger) *Module {
-	return &Module{
+func New(subscriber message.Subscriber, logger *slog.Logger) *App {
+	return &App{
 		subscriber: subscriber,
 		logger:     logger,
 	}
 }
 
+func (m *App) GetName() string {
+	return "notification"
+}
+
 // StartWorkers boots up the background listeners for this module
 // This mehod blocks until shutdown (ctx canceled)
-func (m *Module) StartWorkers(ctx context.Context) error {
+func (m *App) Start(ctx context.Context) error {
 	messages, err := m.subscriber.Subscribe(ctx, "todo.created")
 	if err != nil {
 		return eris.Wrap(err, "events subscription failed")
@@ -51,7 +55,7 @@ func (m *Module) StartWorkers(ctx context.Context) error {
 	return nil
 }
 
-func (m *Module) Close() error {
+func (m *App) Close() error {
 	m.logger.Info("shutting down notifications module internal resources")
 
 	return nil
