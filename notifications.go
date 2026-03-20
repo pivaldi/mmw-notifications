@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/http"
 
 	"github.com/ThreeDotsLabs/watermill/message"
 	oglcore "github.com/ovya/ogl/platform/core"
@@ -19,8 +18,6 @@ type App struct {
 
 // Ensure Module implements oglcore.Module
 var _ oglcore.Module = (*App)(nil)
-
-func (m *App) RegisterRoutes(_ *http.ServeMux) {}
 
 func New(subscriber message.Subscriber, logger *slog.Logger) *App {
 	return &App{
@@ -45,7 +42,7 @@ func (m *App) Start(ctx context.Context) error {
 
 	// This blocks the errgroup correctly until shutdown
 	for msg := range messages {
-		m.logger.Info(fmt.Sprintf("Notification Service: received event new Todo! Payload: %s\n", string(msg.Payload)))
+		m.logger.Info(fmt.Sprintf("Notification Service: received event. Payload: %s\n", string(msg.Payload)))
 
 		msg.Ack()
 	}
