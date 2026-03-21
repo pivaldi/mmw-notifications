@@ -1,16 +1,20 @@
-module github.com/pivaldi/mmw/notifications
+module github.com/pivaldi/mmw-notifications
 
 go 1.26.1
 
 require (
 	github.com/ThreeDotsLabs/watermill v1.5.1
+	github.com/pressly/goose/v3 v3.27.0
 	github.com/rotisserie/eris v0.5.4
 )
 
 require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
+	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/stretchr/testify v1.11.1 // indirect
+	github.com/sethvargo/go-retry v0.3.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
 )
