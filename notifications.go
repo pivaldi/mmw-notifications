@@ -17,17 +17,13 @@ type App struct {
 }
 
 // Ensure Module implements oglcore.Module
-var _ oglcore.Module = (*App)(nil)
+var _ oglcore.App = (*App)(nil)
 
 func New(subscriber message.Subscriber, logger *slog.Logger) *App {
 	return &App{
 		subscriber: subscriber,
 		logger:     logger,
 	}
-}
-
-func (m *App) GetName() string {
-	return "notification"
 }
 
 // StartWorkers boots up the background listeners for this module
