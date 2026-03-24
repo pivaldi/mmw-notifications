@@ -120,5 +120,4 @@ func (m *module) Close() error {
 }
 
 func SendToRocket() {
-
 }
