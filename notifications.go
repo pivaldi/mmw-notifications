@@ -17,54 +17,65 @@ import (
 
 const ModuleName = "Notifications"
 
-var notifier *notify.Notify
-
 type module struct {
 	subscriber message.Subscriber
 	topics     []string
 	logger     *slog.Logger
+	notifier   *notify.Notify
 }
 
 // Ensure Module implements oglcore.Module
 var _ oglcore.Module = (*module)(nil)
 
-func New(subscriber message.Subscriber, logger *slog.Logger, topics ...string) *module {
-	return &module{
-		subscriber: subscriber,
-		topics:     topics,
-		logger:     logger,
-	}
+type Infrastructure struct {
+	Subscriber  message.Subscriber
+	Logger      *slog.Logger
+	Topics      []string
+	WithNotifer bool
 }
 
-// TODO: make a DI service for that.
-func initRocketNotifier() error {
+func New(infra Infrastructure) (*module, error) {
+	m := &module{
+		subscriber: infra.Subscriber,
+		topics:     infra.Topics,
+		logger:     infra.Logger,
+	}
+
+	if infra.WithNotifer {
+		var err error
+		if m.notifier, err = rocketNotifier(); err != nil {
+			return nil, err
+		}
+	}
+
+	return m, nil
+}
+
+// TODO: make a DI service in the real world.
+func rocketNotifier() (*notify.Notify, error) {
 	host := os.Getenv("ROCKET_HOST")
 	if host == "" {
-		return nil
+		return nil, nil
 	}
 
 	user := os.Getenv("ROCKET_USER")
 	key := os.Getenv("ROCKET_KEY")
 	rocketChatSvc, err := rocketchat.New(host, "https", user, key)
 	if err != nil {
-		return eris.Wrap(err, "failed to connect to rocketchat")
+		return nil, eris.Wrap(err, "failed to connect to rocketchat")
 	}
 	rocketChatSvc.AddReceivers("POC_CHANNEL")
-	notifier = notify.New()
+	notifier := notify.New()
 	// notify.UseServices(rocketChatSvc)
 	notifier.UseServices(rocketChatSvc)
 	err = notifier.Send(context.Background(), "Hi", "I am the bot of the mmw events' dispatcher.")
 
-	return eris.Wrap(err, "failed to send message to rocketchat")
+	return notifier, eris.Wrap(err, "failed to send message to rocketchat")
 }
 
 // Start boots up one listener per topic and blocks until shutdown (ctx canceled).
 func (m *module) Start(ctx context.Context) error {
 	// For the demostration to the OVYA team
-	if err := initRocketNotifier(); err != nil {
-		return err
-	}
-
 	g, gCtx := errgroup.WithContext(ctx)
 
 	for _, topic := range m.topics {
@@ -82,8 +93,8 @@ func (m *module) Start(ctx context.Context) error {
 					"topic", topic,
 					"payload", payloadStr,
 				)
-				if notifier != nil {
-					_ = notifier.Send(context.Background(), "event received > "+topic, payloadStr)
+				if m.notifier != nil {
+					_ = m.notifier.Send(context.Background(), "event received > "+topic, payloadStr)
 				}
 
 				msg.Ack()
