@@ -7,14 +7,8 @@ quiet = true
 [tools]
 go = "latest"
 golangci-lint = "latest"
-zellij = "latest"
-# pinning a specific version is a strict best practice for mockery.
-"go:github.com/vektra/mockery/v3" = "v3.7.0"
 
 [shell_alias]
-dev = "mise run run:dev"
-build = "mise run build"
-deploy = "mise run deploy"
 r = "mise run"
 
 [vars]
@@ -24,14 +18,12 @@ MIGRATIONS_DIR= "{{config_root}}/internal/infra/persistence/migrations/scripts"
 
 # Environment variables
 [env]
-BINARY_NAME = "todo"
-BINARY_PATH = "./cmd/todo"
+BINARY_NAME = "notifications"
+BINARY_PATH = "./cmd/notifications"
 BUILD_DIR = "bin"
 _.file = ".envrc"  # Load .envrc file if it exists
 APP_ENV = { required = true }
 APP_NAME = { required = true }
-DB_PASSWORD="postgres" # TODO: make it secret
-DB_URL="postgres://postgres:{{env.DB_PASSWORD}}@localhost:5435/mmw?sslmode=disable"
 
 [tasks.setup]
 description = "Update Repo Deps"
@@ -191,13 +183,14 @@ description = "Run all checks (format, vet, lint)"
 depends = ["fmt", "vet", "lint", "buf-lint"]
 
 [tasks."arch:check"]
-description = "Validate architecture boundaries for this service"
+description = "Validate architecture boundaries for this module"
 run = "arch-go"
 
 [tasks."arch:graph"]
-description = "Show graph architectural dependcies for this service"
-run = """goda graph github.com/pivaldi/mmw/todo/... | dot -Tsvg -o graph.svg &&
-  xdg-open graph.svg
+description = "Show graph architectural dependcies for this module"
+run = """goda graph \
+  "shared(github.com/pivaldi/mmw-notifications:all, github.com/pivaldi/mmw-notifications/... + github.com/pivaldi/mmw-auth/.. + github.com/pivaldi/mmw-todo/... + github.com/pivaldi/mmw-contracts/...) - github.com/pivaldi/mmw-notification/cmd/migration  - github.com/pivaldi/mmw-notifications/internal/infra/persistence/migrations/..." \
+  | dot -Tsvg -o graph.svg  &&  echo 'Generated graph: {{config_root}}/graph.svg'
  """
 
 # Dependency tasks
@@ -225,16 +218,6 @@ description = "List all dependencies"
 run = """
 echo "All dependencies in workspace:"
 goda list "./..."
-"""
-
-[tasks."deps:services"]
-description = "Show dependencies between services and libs"
-run = """
-echo "Service dependencies:"
-goda graph "./services/..."
-echo ""
-echo "Library dependencies:"
-goda graph "./libs/..."
 """
 
 [tasks."deps:verify"]
@@ -280,23 +263,6 @@ run = "go run cmd/migration/migrate.go reset"
 description = "Show current migration statud"
 run = "go run cmd/migration/migrate.go status"
 
-# Docker tasks
-[tasks."docker:build"]
-description = "Build Docker image"
-run = "cd ../.. && docker build -t todo:latest -f services/todo/build/package/Dockerfile ."
-
-[tasks."docker:up"]
-description = "Start Docker Compose services"
-run = "docker-compose -f deployments/docker-compose.yml up -d"
-
-[tasks."docker:down"]
-description = "Stop Docker Compose services"
-run = "docker-compose -f deployments/docker-compose.yml down"
-
-[tasks."docker:logs"]
-description = "View Docker Compose logs"
-run = "docker-compose -f deployments/docker-compose.yml logs -f"
-
 # Running tasks
 [tasks.run]
 description = "Run the application"
@@ -306,14 +272,6 @@ run = "go run ${BINARY_PATH}/main.go"
 [tasks."run:dev"]
 description = "Run with hot reload (requires air)"
 run = "go tool air"
-
-[tasks."web:start"]
-description = "Run with hot reload (requires air)"
-run = "cd web/todoapp/ && npm install && npm start"
-
-[tasks."zellif:dev"]
-description = "Bootstrap the project with Zellij"
-run = "zellij --layout third_party/zeillij/dev-layout.kdl"
 
 # Default task (show help)
 [tasks.default]

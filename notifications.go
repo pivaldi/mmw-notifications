@@ -15,21 +15,21 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-const AppName = "Notifications"
+const ModuleName = "Notifications"
 
 var notifier *notify.Notify
 
-type App struct {
+type module struct {
 	subscriber message.Subscriber
 	topics     []string
 	logger     *slog.Logger
 }
 
 // Ensure Module implements oglcore.Module
-var _ oglcore.App = (*App)(nil)
+var _ oglcore.Module = (*module)(nil)
 
-func New(subscriber message.Subscriber, logger *slog.Logger, topics ...string) *App {
-	return &App{
+func New(subscriber message.Subscriber, logger *slog.Logger, topics ...string) *module {
+	return &module{
 		subscriber: subscriber,
 		topics:     topics,
 		logger:     logger,
@@ -59,7 +59,7 @@ func initRocketNotifier() error {
 }
 
 // Start boots up one listener per topic and blocks until shutdown (ctx canceled).
-func (m *App) Start(ctx context.Context) error {
+func (m *module) Start(ctx context.Context) error {
 	// For the demostration to the OVYA team
 	if err := initRocketNotifier(); err != nil {
 		return err
@@ -102,7 +102,7 @@ func (m *App) Start(ctx context.Context) error {
 	return nil
 }
 
-func (m *App) Close() error {
+func (m *module) Close() error {
 	m.logger.Info("shutting down notifications module internal resources")
 
 	return nil
