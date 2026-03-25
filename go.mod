@@ -5,7 +5,7 @@ go 1.26.1
 require (
 	github.com/ThreeDotsLabs/watermill v1.5.1
 	github.com/nikoksr/notify v1.5.0
-	github.com/ovya/ogl v0.0.0-20260324114944-8d3d32e966e8
+	github.com/ovya/ogl v0.0.0-20260324224052-968c2f821ca3
 	github.com/pressly/goose/v3 v3.27.0
 	github.com/rotisserie/eris v0.5.4
 	golang.org/x/sync v0.20.0
