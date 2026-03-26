@@ -17,7 +17,7 @@ import (
 
 const ModuleName = "Notifications"
 
-type module struct {
+type Module struct {
 	subscriber message.Subscriber
 	topics     []string
 	logger     *slog.Logger
@@ -25,7 +25,7 @@ type module struct {
 }
 
 // Ensure Module implements oglcore.Module
-var _ oglcore.Module = (*module)(nil)
+var _ oglcore.Module = (*Module)(nil)
 
 type Infrastructure struct {
 	Subscriber  message.Subscriber
@@ -34,8 +34,8 @@ type Infrastructure struct {
 	WithNotifer bool
 }
 
-func New(infra Infrastructure) (*module, error) {
-	m := &module{
+func New(infra Infrastructure) (*Module, error) {
+	m := &Module{
 		subscriber: infra.Subscriber,
 		topics:     infra.Topics,
 		logger:     infra.Logger,
@@ -74,7 +74,7 @@ func rocketNotifier() (*notify.Notify, error) {
 }
 
 // Start boots up one listener per topic and blocks until shutdown (ctx canceled).
-func (m *module) Start(ctx context.Context) error {
+func (m *Module) Start(ctx context.Context) error {
 	// For the demostration to the OVYA team
 	g, gCtx := errgroup.WithContext(ctx)
 
@@ -113,7 +113,7 @@ func (m *module) Start(ctx context.Context) error {
 	return nil
 }
 
-func (m *module) Close() error {
+func (m *Module) Close() error {
 	m.logger.Info("shutting down notifications module internal resources")
 
 	return nil
