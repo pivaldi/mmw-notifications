@@ -10,7 +10,7 @@ import (
 	"github.com/nikoksr/notify/service/rocketchat"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	oglcore "github.com/ovya/ogl/platform/core"
+	pfcore "github.com/piprim/mmw/platform/core"
 	"github.com/rotisserie/eris"
 	"golang.org/x/sync/errgroup"
 )
@@ -24,8 +24,8 @@ type Module struct {
 	notifier   *notify.Notify
 }
 
-// Ensure Module implements oglcore.Module
-var _ oglcore.Module = (*Module)(nil)
+// Ensure Module implements pfcore.Module
+var _ pfcore.Module = (*Module)(nil)
 
 type Infrastructure struct {
 	Subscriber  message.Subscriber
