@@ -10,7 +10,7 @@ import (
 	"github.com/nikoksr/notify/service/rocketchat"
 
 	"github.com/ThreeDotsLabs/watermill/message"
-	pfcore "github.com/piprim/mmw/platform/core"
+	pfcore "github.com/piprim/mmw/pkg/platform/core"
 	"github.com/rotisserie/eris"
 	"golang.org/x/sync/errgroup"
 )
