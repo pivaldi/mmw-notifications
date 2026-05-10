@@ -34,6 +34,7 @@ run = """
   cd {{config_root}} || exit 1
   source scripts/common/libs/st.bash
 
+  st.quiet
   st.h1 'Fix GOPRIVATE for this project'
   st.doing go env -w "GOPRIVATE=github.com/pivaldi/mmw-*"
   st.done
@@ -49,11 +50,11 @@ run = """
 
 [tasks.tools]
 description = "Install needed tools awares APP_ENV value"
-run = "scripts/common/install-tools-ss.sh"
+run = "scripts/common/install-tools.sh"
 
 [tasks."tools:update"]
 description = "Install/Update needed tools"
-run = "UPDATE=true scripts/common/install-tools-ss.sh"
+run = "UPDATE=true scripts/common/install-tools.sh"
 
 
 [tasks.pre-commit]
